@@ -22,7 +22,7 @@ export default class TodoListItem extends Component {
 	};
 
 	render() {
-		const { label } = this.props;
+		const { label, onDeleted } = this.props;
 		const { completed, editing } = this.state;
 
 		let classNames = '';
@@ -51,7 +51,7 @@ export default class TodoListItem extends Component {
 						className='icon icon-edit'
 						onClick={this.editorClick}
 					></button>
-					<button className='icon icon-destroy'></button>
+					<button className='icon icon-destroy' onClick={onDeleted}></button>
 				</div>
 				<input type='text' className='edit' value='' />
 			</li>

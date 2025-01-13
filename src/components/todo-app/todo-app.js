@@ -22,7 +22,13 @@ export default class TodoApp extends Component {
 	};
 
 	deleteItem = id => {
-		console.log(id);
+		this.setState(({ todoData }) => {
+			const idx = todoData.findIndex(el => el.id === id);
+			const newArray = todoData.toSpliced(idx, 1);
+			return {
+				todoData: newArray,
+			};
+		});
 	};
 
 	render() {
