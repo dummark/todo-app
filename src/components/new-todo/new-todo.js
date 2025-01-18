@@ -1,10 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import './new-todo.css';
 
-const NewTodo = () => {
-	const searchText = 'What needs to be done?';
-	return <input className='new-todo' placeholder={searchText} autoFocus='' />;
-};
+function NewTodo({ onItemAdded }) {
+	const [value, setValue] = useState('');
+	const [tasks, setTasks] = useState([]);
+
+	const addTask = e => {
+		if (e.key === 'Enter') {
+			onItemAdded(value);
+			setValue('');
+		}
+	};
+
+	return (
+		<input
+			className='new-todo'
+			placeholder={'What needs to be done?'}
+			autoFocus=''
+			value={value}
+			onChange={e => setValue(e.target.value)}
+			onKeyDown={addTask}
+		/>
+	);
+}
 
 export default NewTodo;

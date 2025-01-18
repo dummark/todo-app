@@ -8,6 +8,8 @@ import Footer from '../footer';
 import './todo-app.css';
 
 export default class TodoApp extends Component {
+	maxId = 100;
+
 	state = {
 		todoData: [
 			{ label: 'drink', id: 1 },
@@ -31,11 +33,21 @@ export default class TodoApp extends Component {
 		});
 	};
 
+	addItem = text => {
+		const newItem = { label: text, id: this.maxId++ };
+
+		this.setState(({ todoData }) => {
+			const newArr = [...todoData, newItem];
+
+			return { todoData: newArr };
+		});
+	};
+
 	render() {
 		return (
 			<div className='todoapp'>
 				<AppHeader />
-				<NewTodo />
+				<NewTodo onItemAdded={this.addItem} />
 				<TodoList todos={this.state.todoData} onDeleted={this.deleteItem} />
 				<Footer status={this.state.statuses} />
 			</div>
