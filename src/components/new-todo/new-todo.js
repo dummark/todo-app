@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 
 import './new-todo.css';
 
-function NewTodo({ onItemAdded }) {
+const NewTodo = ({ onItemAdded }) => {
 	const [value, setValue] = useState('');
-	const [tasks, setTasks] = useState([]);
 
 	const addTask = e => {
 		if (e.key === 'Enter') {
@@ -23,6 +22,6 @@ function NewTodo({ onItemAdded }) {
 			onKeyDown={addTask}
 		/>
 	);
-}
+};
 
 export default NewTodo;

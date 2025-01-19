@@ -1,60 +1,71 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 import './todo-list-item.css';
+import { formatDistanceToNowStrict } from 'date-fns';
 
-export default class TodoListItem extends Component {
-	state = {
-		completed: false,
-		editing: false,
+const TodoListItem = ({
+	id,
+	label,
+	date,
+	completed,
+	onDeleted,
+	onToggleDone,
+	onUpdate,
+}) => {
+	const [editing, setEditing] = useState(false);
+	const [editValue, setEditValue] = useState(label);
+
+	const editorClick = () => {
+		setEditing(true);
 	};
 
-	onCheckboxClick = () => {
-		this.setState(({ completed }) => {
-			return {
-				completed: !completed,
-			};
-		});
+	const handleEditChange = e => {
+		setEditValue(e.target.value);
 	};
 
-	editorClick = () => {
-		this.setState({
-			editing: true,
-		});
-	};
-
-	render() {
-		const { label, onDeleted } = this.props;
-		const { completed, editing } = this.state;
-
-		let classNames = '';
-
-		if (completed) {
-			classNames += ' completed';
+	const handleEditSubmit = e => {
+		if (e.key === 'Enter') {
+			onUpdate(id, editValue);
+			setEditing(false);
 		}
+	};
 
-		if (editing) {
-			classNames += ' editing';
-		}
+	const classNames = ['todo-list-item'];
+	if (completed) classNames.push('completed');
+	if (editing) classNames.push('editing');
 
-		return (
-			<li key={TodoListItem.id} className={classNames}>
-				<div className='view'>
-					<input
-						className='toggle'
-						type='checkbox'
-						onClick={this.onCheckboxClick}
-					/>
-					<label>
-						<span className='description'>{label}</span>
-						<span className='created'>created 5 minutes ago</span>
-					</label>
-					<button
-						className='icon icon-edit'
-						onClick={this.editorClick}
-					></button>
-					<button className='icon icon-destroy' onClick={onDeleted}></button>
-				</div>
-				<input type='text' className='edit' value='' />
-			</li>
-		);
-	}
-}
+	const timeOfCreate = formatDistanceToNowStrict(date, {
+		includeSeconds: true,
+	});
+
+	return (
+		<li className={classNames.join(' ')}>
+			<div className='view'>
+				<input
+					className='toggle'
+					type='checkbox'
+					checked={completed}
+					onChange={onToggleDone}
+				/>
+				<label>
+					<span className='description'>{editValue}</span>
+					<span className='created'>created {timeOfCreate} ago</span>
+				</label>
+				<button className='icon icon-edit' onClick={editorClick}></button>
+				<button className='icon icon-destroy' onClick={onDeleted}></button>
+			</div>
+
+			{editing && (
+				<input
+					type='text'
+					className='edit'
+					value={editValue}
+					onChange={handleEditChange}
+					onKeyDown={handleEditSubmit}
+					onBlur={() => setEditing(false)}
+				/>
+			)}
+		</li>
+	);
+};
+
+export default TodoListItem;

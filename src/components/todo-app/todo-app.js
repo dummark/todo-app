@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState } from 'react';
 
 import AppHeader from '../app-header';
 import NewTodo from '../new-todo';
@@ -7,50 +7,88 @@ import Footer from '../footer';
 
 import './todo-app.css';
 
-export default class TodoApp extends Component {
-	maxId = 100;
+const TodoApp = () => {
+	const [todoData, setTodoData] = useState([
+		{ label: 'drink', id: 1, completed: false, date: new Date() },
+		{ label: 'eat', id: 2, completed: false, date: new Date() },
+		{ label: 'study', id: 3, completed: false, date: new Date() },
+	]);
 
-	state = {
-		todoData: [
-			{ label: 'drink', id: 1 },
-			{ label: 'eat', id: 2 },
-			{ label: 'study', id: 3 },
-		],
-		statuses: [
-			{ status: 'All', id: 'al' },
-			{ status: 'Active', id: 'ac' },
-			{ status: 'Completed', id: 'co' },
-		],
-	};
+	const [filter, setFilter] = useState('all');
 
-	deleteItem = id => {
-		this.setState(({ todoData }) => {
-			const idx = todoData.findIndex(el => el.id === id);
-			const newArray = todoData.toSpliced(idx, 1);
-			return {
-				todoData: newArray,
-			};
+	const doneCount = todoData.filter(el => !el.completed).length;
+
+	const deleteItem = id => {
+		setTodoData(prevTodoData => {
+			const newTodoData = prevTodoData.filter(item => item.id !== id);
+			return newTodoData;
 		});
 	};
 
-	addItem = text => {
-		const newItem = { label: text, id: this.maxId++ };
-
-		this.setState(({ todoData }) => {
-			const newArr = [...todoData, newItem];
-
-			return { todoData: newArr };
-		});
+	const addItem = text => {
+		const newItem = {
+			label: text,
+			id: new Date(),
+			completed: false,
+			date: new Date(),
+		};
+		setTodoData(prevTodoData => [...prevTodoData, newItem]);
 	};
 
-	render() {
-		return (
-			<div className='todoapp'>
-				<AppHeader />
-				<NewTodo onItemAdded={this.addItem} />
-				<TodoList todos={this.state.todoData} onDeleted={this.deleteItem} />
-				<Footer status={this.state.statuses} />
-			</div>
+	const onToggleDone = id => {
+		setTodoData(prevTodoData =>
+			prevTodoData.map(todo =>
+				todo.id === id ? { ...todo, completed: !todo.completed } : todo
+			)
 		);
-	}
-}
+	};
+
+	const onUpdate = (id, newLabel) => {
+		setTodoData(prevTodoData => {
+			return prevTodoData.map(todo =>
+				todo.id === id ? { ...todo, label: newLabel } : todo
+			);
+		});
+	};
+
+	const filteredTodos = todoData.filter(item => {
+		switch (filter) {
+			case 'active':
+				return !item.completed;
+			case 'completed':
+				return item.completed;
+			default:
+				return true;
+		}
+	});
+
+	const clearCompleted = () => {
+		setTodoData(prevTodoData => {
+			const newTodoData = prevTodoData.filter(el => !el.completed);
+			return newTodoData;
+		});
+	};
+
+	const changeFilter = newFilter => setFilter(newFilter);
+
+	return (
+		<div className='todoapp'>
+			<AppHeader />
+			<NewTodo onItemAdded={addItem} />
+			<TodoList
+				todos={filteredTodos}
+				onDeleted={deleteItem}
+				onToggleDone={onToggleDone}
+				onUpdate={onUpdate}
+			/>
+			<Footer
+				doneCount={doneCount}
+				filter={filter}
+				onFilterChange={changeFilter}
+				clearCompleted={clearCompleted}
+			/>
+		</div>
+	);
+};
+
+export default TodoApp;
